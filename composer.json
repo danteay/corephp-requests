@@ -5,7 +5,6 @@
         "psr", "psr-7", "corephp", "requests"
     ],
     "homepage": "https://github.com/danteay/corephp-requests",
-    "license": "Apache-2",
     "authors": [
         {
             "name": "Eduardo Aguilar",
