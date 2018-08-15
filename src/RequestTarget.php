@@ -5,6 +5,7 @@ namespace CorePHP\Requests;
 class RequestTarget
 {
     private $uri;
+    private $body;
     private $method;
     private $headers;
     private $basicAuth;
@@ -17,6 +18,16 @@ class RequestTarget
     public function getUri()
     {
         return $this->uri;
+    }
+
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
+
+    public function getBody()
+    {
+        return $this->body;
     }
 
     public function setMethod($method)

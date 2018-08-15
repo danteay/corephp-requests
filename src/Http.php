@@ -15,7 +15,7 @@ class Http
      * Http Constructor
      * @param string $url
      */
-    public function __construct($url)
+    public function __construct($url=null)
     {
         $this->url = $url;
         $this->headers = array();
@@ -24,6 +24,17 @@ class Http
         curl_setopt($this->handler, CURLOPT_HEADER, true);
         curl_setopt($this->handler, CURLOPT_COOKIE, true);
         curl_setopt($this->handler, CURLOPT_RETURNTRANSFER, true);
+    }
+
+    /**
+     * Set the url that will be requested
+     *
+     * @param string $url
+     * @return void
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
