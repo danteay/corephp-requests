@@ -9,7 +9,14 @@ class Response implements ResponseInterface
     private $statusCode;
     private $reasonPhrase;
     private $headers;
+    private $protocol;
     private $body;
+    private $uri;
+
+    public function __construct()
+    {
+
+    }
 
     /**
      * Return the status code
@@ -153,11 +160,6 @@ class Response implements ResponseInterface
         return $this->bodyParsed;
     }
 
-    public function setBody($body)
-    {
-        $this->body = $body;
-    }
-
     public function withHeaders($headers)
     {
         $this->headers = $headers;
@@ -171,37 +173,41 @@ class Response implements ResponseInterface
 
     public function withUri(\Psr\Http\Message\UriInterface $uri, $preserveHost = false)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->uri = $uri;
     }
 
     public function getProtocolVersion()
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        return $this->protocol;
     }
 
     public function withProtocolVersion($version)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->protocol = $version;
     }
 
     public function getHeaderLine($name)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        return $this->headers[$name];
     }
 
     public function withAddedHeader($name, $value)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        if (array_key_exists($name, $this->headers)) {
+            $this->headers[$name] .= ", {$value}";
+        } else {
+            $this->headers[$name] = $value;
+        }
     }
 
     public function withoutHeader($name)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        unset($this->headers[$name]);
     }
 
     public function withHeader($name, $value)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->headers[$name] = $value;
     }
 
     public function withBody(\Psr\Http\Message\StreamInterface $body)

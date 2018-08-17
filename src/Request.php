@@ -3,6 +3,7 @@
 namespace CorePHP\Requests;
 
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 
 class Request implements RequestInterface
 {
@@ -33,11 +34,18 @@ class Request implements RequestInterface
     private $http;
 
     /**
+     * Flat to keep the origin url set in the first instanciation
+     *
+     * @var bool
+     */
+    private $preserveHost;
+
+    /**
      * Request Constructor
      */
     public function __construct()
     {
-        $this->target = new RequestTarget();
+        $this->target = RequestTarget::getInstanace();
         $this->http = new Http();
     }
 
@@ -57,7 +65,7 @@ class Request implements RequestInterface
         $instance = new Request();
 
         if (!empty($url)) {
-            $instance->target->setUri($url);
+            $instance->target->withUri(new RequestUri($url));
         }
 
         if (!empty($type)) {
@@ -65,19 +73,19 @@ class Request implements RequestInterface
                 throw new \Exception("Invalid method {$type} to create an instance of Request");
             }
 
-            $instance->target->setMethod($type);
+            $instance->target->withMethod($type);
         }
 
         if (!empty($headers) && is_array($headers)) {
-            $instance->target->setHeaders($headers);
+            $instance->target->withHeaders($headers);
         }
 
         if (!empty($headers) && is_array($auth)) {
-            $instance->target->setBasicAuth($auth['user'], $auth['pass']);
+            $instance->target->withBasicAuth($auth['user'], $auth['pass']);
         }
 
         if (!empty($data)) {
-            $instance->target->setBody($body);
+            $instance->target->withBody($body);
         }
 
         return $instance;
@@ -159,7 +167,7 @@ class Request implements RequestInterface
      */
     public function withMethod($method)
     {
-        $this->target->setMethod($method);
+        $this->target->withMethod($method);
     }
 
     /**
@@ -187,17 +195,21 @@ class Request implements RequestInterface
         return $this->target->getUri();
     }
 
+    public function withUri(UriInterface $uri, $preserveHost = false)
+    {
+        $lastUri = $this->target->getUri();
+
+        if ($this->preserveHost && $preserveHost && empty($host)) {
+
+        }
+    }
+
     public function getBody()
     {
         return $this->target->getBody();
     }
 
     public function withBody(\Psr\Http\Message\StreamInterface $body)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function withUri(\Psr\Http\Message\UriInterface $uri, $preserveHost = false)
     {
         throw new \BadMethodCallException("Not Implemented Method");
     }

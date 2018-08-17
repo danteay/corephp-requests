@@ -4,46 +4,73 @@ namespace CorePHP\Requests;
 
 class Http
 {
-    private $url;
-    private $data;
-    private $auth;
-    private $method;
-    private $headers;
+    /**
+     * Request Target
+     *
+     * @var \CorePHP\Requests\RequestTarget
+     */
+    private $target;
+
+    /**
+     * CRUL resoruce
+     *
+     * @var resource
+     */
     private $handler;
 
     /**
      * Http Constructor
-     * @param string $url
      */
-    public function __construct($url=null)
+    public function __construct()
     {
-        $this->url = $url;
-        $this->headers = array();
-        $this->handler = curl_init($this->url);
+        $this->target = RequestTarget::getInstanace();
+
+    }
+
+    /**
+     * Retrive an instace of Http object
+     *
+     * @param RequestTarget $target
+     * @return Http
+     */
+    public static function getInstance(RequestTarget $target = null)
+    {
+        if (empty($target)) {
+            return new Http();
+        }
+
+        return self::getInstance()
+            ->withRequestTarget($target)
+            ->createHandler();
+    }
+
+    /**
+     * Create instance of CURL handler
+     */
+    public function createHandler()
+    {
+        $this->headers = [];
+        $this->handler = curl_init($this->target->getUri());
 
         curl_setopt($this->handler, CURLOPT_HEADER, true);
         curl_setopt($this->handler, CURLOPT_COOKIE, true);
         curl_setopt($this->handler, CURLOPT_RETURNTRANSFER, true);
-    }
 
-    /**
-     * Set the url that will be requested
-     *
-     * @param string $url
-     * @return void
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
+        $this->setMethod();
+        $this->setAuth();
+        $this->setHeaders();
+        $this->setBody();
     }
 
     /**
      * Set HTTP Method for the request
-     * @param string $method
+     *
      * @throws \Exception
      */
-    public function setMethod($method)
+    private function setMethod()
     {
+        $method = $this->target->geMethod();
+
         switch ($method) {
             case 'GET':
             case 'POST':
@@ -60,49 +87,62 @@ class Http
 
     /**
      * Set basic auth params for the request
-     * @param array $auth
+     *
      * @throws \Exception
      */
-    public function setAuth(array $auth)
+    private function setAuth()
     {
-        if (!empty($auth)) {
-            if (array_key_exists('user', $auth) && array_key_exists('pass', $auth)) {
-                $this->auth = $auth['user'].':'.$auth['pass'];
-                curl_setopt($this->handler, CURLOPT_USERPWD, $this->auth);
-            } else {
-                $message = 'Cant assign the user and password for basic auth';
-                throw new \Exception($message);
-            }
-        }
+        $auth = $this->target->getBasicAuth();
 
+        if (!empty($auth)) {
+            curl_setopt($this->handler, CURLOPT_USERPWD, $auth);
+        }
     }
 
     /**
      * Set json data for the request
-     * @param array $data
      */
-    public function setJsonData(array $data)
+    private function setBody()
     {
-        if (!empty($data)) {
-            $this->data = json_encode($data);
-            $this->headers = array_merge(
-                $this->headers,
-                [
-                    'Content-Type' => 'application/json',
-                    'Content-Length' => strlen($this->data)
-                ]
-            );
+        $body = $this->target->getBody()->getOriginalContents();
 
-            curl_setopt($this->handler, CURLOPT_POSTFIELDS, $this->data);
+        if (!array_key_exists('Content-Type', $this->headers)) {
+            $this->headers['Content-Type'] = "text/plain; charset=utf-8";
         }
+
+        $contentType = explode(';', $this->headers['Content-Type']);
+        $contentType = trim($contentType[0]);
+
+        if (is_string($body)) {
+            curl_setopt($this->handler, CURLOPT_POSTFIELDS, $body);
+            return;
+        }
+
+        if (is_array($body) || is_object($body)) {
+            switch ($contentType) {
+                case 'application/json':
+                case 'text/json':
+                    $body = json_encode($body);
+                    break;
+
+                case 'application/x-www-form-urlencoded':
+                    $body = http_build_query($body);
+                    break;
+            }
+        } else {
+            throw new \Exception("Invalid request body content");
+        }
+
+        curl_setopt($this->handler, CURLOPT_POSTFIELDS, $body);
     }
 
     /**
      * Set request headers
-     * @param array $headers
      */
-    public function setHeaders(array $headers)
+    private function setHeaders()
     {
+        $headers = $this->target->getHeaders();
+
         if (!empty($headers)) {
             $this->headers = array_merge($this->headers, $headers);
         }
@@ -110,6 +150,7 @@ class Http
 
     /**
      * Execute request from previous configuration
+     *
      * @return Response
      * @throws \Exception
      */
@@ -126,18 +167,9 @@ class Http
         $body = curl_exec($this->handler);
 
         if(empty($body)){
+            $error = curl_error($this->handler);
             $code = curl_errno($this->handler);
-
-            if ($code == 60 || $code == 77) {
-                curl_setopt($this->handler, CURLOPT_CAINFO, __DIR__ . '/cacerts.pem');
-                $body = curl_exec($this->handler);
-            }
-
-            if(empty($body)){
-                $error = curl_error($this->handler);
-                $code = curl_errno($this->handler);
-                throw new \Exception($error, $code);
-            }
+            throw new \Exception($error, $code);
         }
 
         $statusCode = curl_getinfo($this->handler, CURLINFO_HTTP_CODE);
