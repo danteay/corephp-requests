@@ -2,6 +2,7 @@ language: php
 
 php:
   - 7.1
+  - 7.2
 
 branche:
   only: master
@@ -11,4 +12,4 @@ before_script:
   - composer install --no-interaction
 
 script:
-  - vendor/bin/phpunit --coverage-text
+  - vendor/bin/phpunit
