@@ -1,8 +1,6 @@
 <?php
 
-namespace CorePHP\Requests\UnitTest;
-
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace CorePHP\Requests\Test;
 
 use PHPUnit\Framework\TestCase;
 use CorePHP\Requests\Request as HttpReq;

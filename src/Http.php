@@ -46,6 +46,9 @@ class Http
 
     /**
      * Create instance of CURL handler
+     *
+     * @return static
+     * @throws \Exception
      */
     public function createHandler()
     {
@@ -60,6 +63,20 @@ class Http
         $this->setAuth();
         $this->setHeaders();
         $this->setBody();
+
+        return self;
+    }
+
+    /**
+     * Set the target that will be requested
+     *
+     * @param RequestTarget $target
+     * @return static
+     */
+    public function withRequestTarget(RequestTarget $target)
+    {
+        $this->target = $target;
+        return self;
     }
 
     /**
@@ -189,19 +206,20 @@ class Http
      * @param Response $response
      * @return void
      */
-    private function getBodyAndHeaders($body, &$response)
+    private function getBodyAndHeaders($body, Response &$response)
     {
         $headers = array();
-
         $data = explode("\n",$body);
 
         $flag = 1;
 
         foreach ($data as $part) {
             if ($flag == 1) {
-                $headers['Protocol'] = explode(' ', $part)[0];
+                $protocol = explode(' ', $part)[0];
+                $response->withProtocolVersion($protocol);
             } else if(count($data) == $flag) {
-                $response->setBody(trim($part));
+                $stream = RequestBody::getInstance(trim($part));
+                $response->withBody($stream);
                 break;
             } else {
                 $aux = explode(': ', $part);
@@ -216,5 +234,4 @@ class Http
 
         $response->withHeaders($headers);
     }
-
 }

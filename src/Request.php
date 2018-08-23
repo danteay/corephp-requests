@@ -4,6 +4,7 @@ namespace CorePHP\Requests;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\StreamInterface;
 
 class Request implements RequestInterface
 {
@@ -22,14 +23,14 @@ class Request implements RequestInterface
     /**
      * Target information of the request
      *
-     * @var \CorePHP\Requests\RequestTarget
+     * @var RequestTarget
      */
     private $target;
 
     /**
      * Http object
      *
-     * @var \CorePHP\Requests\Http
+     * @var Http
      */
     private $http;
 
@@ -60,8 +61,13 @@ class Request implements RequestInterface
      * @return Request
      * @throws \Exception
      */
-    public static function getInstance($type=null, $url=null, $body=null, $headers=array(), $auth=array())
-    {
+    public static function getInstance(
+        $type=null,
+        $url=null,
+        $body=null,
+        array $headers=null,
+        array $auth=null
+    ) {
         $instance = new Request();
 
         if (!empty($url)) {
@@ -164,16 +170,18 @@ class Request implements RequestInterface
      * Set target MEthod
      *
      * @param string $method
+     * @return static
      */
     public function withMethod($method)
     {
         $this->target->withMethod($method);
+        return self;
     }
 
     /**
      * Return the Target object
      *
-     * @return \CorePHP\Requests\RequestTarget
+     * @return RequestTarget
      */
     public function getRequestTarget()
     {
@@ -184,34 +192,159 @@ class Request implements RequestInterface
      * Set Target to the current Request
      *
      * @param RequestTarget $requestTarget
+     * @return static
      */
     public function withRequestTarget(RequestTarget $requestTarget)
     {
         $this->target = $requestTarget;
+        return self;
     }
 
+    /**
+     * Return the Request URI of the target
+     *
+     * @return UriInterface
+     */
     public function getUri()
     {
         return $this->target->getUri();
     }
 
+    /**
+     * Add a valid URI for the request
+     *
+     * @param UriInterface $uri
+     * @param boolean $preserveHost
+     * @return static
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $lastUri = $this->target->getUri();
+        $host = $lastUri->getHost();
 
-        if ($this->preserveHost && $preserveHost && empty($host)) {
-
+        if ($this->preserveHost) {
+            $uri->withHost($host);
+            $this->uri = $uri;
+            $this->preserveHost = $preserveHost;
+        } else {
+            $this->uri = $uri;
         }
+
+        return self;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return StreamInterface
+     */
     public function getBody()
     {
         return $this->target->getBody();
     }
 
-    public function withBody(\Psr\Http\Message\StreamInterface $body)
+    /**
+     * Set the request body
+     *
+     * @param StreamInterface $body
+     * @return static
+     */
+    public function withBody(StreamInterface $body)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->target->withBody($body);
+        return self;
+    }
+
+    /**
+     * Return the headers of the target
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->target->getHeaders();
+    }
+
+    /**
+     * Validate if a specific header is set to the target
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function hasHeader($name)
+    {
+        return array_key_exists($name, $this->getHeaders());
+    }
+
+    /**
+     * Retrive the value of a header
+     *
+     * @param string $name
+     * @return null|array
+     */
+    public function getHeader($name)
+    {
+        return $this->getHeaders[$name] ?? null;
+    }
+
+    /**
+     * Retrive all values of a header into a string
+     *
+     * @param string $name
+     * @return null|string
+     */
+    public function getHeaderLine($name)
+    {
+        return $this->hasHeader($name) ? implode(', ', $this->getHeader($name)) : null;
+    }
+
+    /**
+     * Set header to the request
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function withHeader($name, $value)
+    {
+        $headers = $this->getHeaders();
+        $headers[$name] = [$value];
+        $this->target->withHeaders($headers);
+    }
+
+    /**
+     * Add value to a header
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function withAddedHeader($name, $value)
+    {
+        $headers = $this->getHeaders();
+        $headers[$name][] = $value;
+        $this->target->withHeaders($headers);
+    }
+
+    /**
+     * Remove a specific header
+     *
+     * @param string $name
+     */
+    public function withoutHeader($name)
+    {
+        $headers = $this->getHeaders();
+        unset($headers[$name]);
+        $this->target->withHeaders($headers);
+    }
+
+    /**
+     * Execute Request
+     *
+     * @return Response
+     */
+    public function execute()
+    {
+        $http = Http::getInstance($this->tartget);
+        return $http->executeRequest();
     }
 
     public function getProtocolVersion()
@@ -222,45 +355,5 @@ class Request implements RequestInterface
     public function withProtocolVersion($version)
     {
         throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function getHeaders()
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function hasHeader($name)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function getHeader($name)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function getHeaderLine($name)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function withHeader($name, $value)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function withAddedHeader($name, $value)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function withoutHeader($name)
-    {
-        throw new \BadMethodCallException("Not Implemented Method");
-    }
-
-    public function execute()
-    {
-
     }
 }

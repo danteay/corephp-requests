@@ -1,6 +1,8 @@
 <testsuites>
     <testsuite name="unittest">
-        <directory>tests</directory>
         <file>tests/TestRequest.php</file>
+    </testsuite>
+    <testsuite name="coverage">
+        <directory>test/coverage</directory>
     </testsuite>
 </testsuites>
