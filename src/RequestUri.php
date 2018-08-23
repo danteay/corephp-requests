@@ -1,9 +1,31 @@
 <?php
+/**
+ * Request URI Scheme of a request
+ *
+ * PHP Version 7.1
+ *
+ * @category  CorePHP-Module
+ * @package   CorePHP\Requests
+ * @author    Eduardo Aguilar <dante.aguilar41@gmail.com>
+ * @copyright 2018 Eduardo Aguilar
+ * @license   https://github.com/danteay/corephp-requests/LICENSE Apache-2
+ * @link      https://github.com/danteay/corephp-requests
+ */
 
 namespace CorePHP\Requests;
 
 use Psr\Http\Message\UriInterface;
 
+/**
+ * RequestUri
+ *
+ * @category  Class
+ * @package   CorePHP\Requests
+ * @author    Eduardo Aguilar <dante.aguilar41@gmail.com>
+ * @copyright 2018 Eduardo Aguilar
+ * @license   https://github.com/danteay/corephp-requests/LICENSE Apache-2
+ * @link      https://github.com/danteay/corephp-requests
+ */
 class RequestUri implements UriInterface
 {
     /**
@@ -11,61 +33,62 @@ class RequestUri implements UriInterface
      *
      * @var string
      */
-    private $scheme;
+    private $_scheme;
 
     /**
      * User of the Uri
      *
      * @var string
      */
-    private $user;
+    private $_user;
 
     /**
      * Password of the Uri
      *
      * @var string
      */
-    private $pass;
+    private $_pass;
 
     /**
      * Hostname of the Uri
      *
      * @var string
      */
-    private $host;
+    private $_host;
 
     /**
      * Port of the Hostname
      *
      * @var int
      */
-    private $port;
+    private $_port;
 
     /**
      * Path after the hostname
      *
      * @var string
      */
-    private $path;
+    private $_path;
 
     /**
      * Querystring after the path
      *
      * @var string
      */
-    private $query;
+    private $_query;
 
     /**
      * Fragment section after the querystring
      *
      * @var string
      */
-    private $fragment;
+    private $_fragment;
 
     /**
      * Create and instance of RequestUri
      *
-     * @param string $url
+     * @param string $url Url that will be converted
+     *
      * @return RequestUri
      */
     public static function getInstance($url=null)
@@ -92,11 +115,12 @@ class RequestUri implements UriInterface
      * Return an instance with the specified scheme.
      *
      * @param string $scheme The scheme to use with the new instance.
-     * @return RequestUri A new instance with the specified scheme.
+     *
+     * @return RequestUri
      */
     public function withScheme($scheme)
     {
-        $this->scheme = $scheme;
+        $this->_scheme = $scheme;
 
         return $this;
     }
@@ -104,14 +128,15 @@ class RequestUri implements UriInterface
     /**
      * Return an instance with the specified user information.
      *
-     * @param string $user The user name to use for authority.
+     * @param string      $user     The user name to use for authority.
      * @param null|string $password The password associated with $user.
-     * @return RequestUri A new instance with the specified user information.
+     *
+     * @return RequestUri
      */
     public function withUserInfo($user, $password = null)
     {
-        $this->user = $user;
-        $this->pass = $password;
+        $this->_user = $user;
+        $this->_pass = $password;
 
         return $this;
     }
@@ -120,11 +145,12 @@ class RequestUri implements UriInterface
      * Return an instance with the specified host.
      *
      * @param string $host The hostname to use with the new instance.
-     * @return RequestUri A new instance with the specified host.
+     *
+     * @return RequestUri
      */
     public function withHost($host)
     {
-        $this->host = $host;
+        $this->_host = $host;
 
         return $this;
     }
@@ -133,12 +159,13 @@ class RequestUri implements UriInterface
      * Return an instance with the specified port.
      *
      * @param null|int $port The port to use with the new instance; a null value
-     *     removes the port information.
-     * @return RequestUri A new instance with the specified port.
+     *                       removes the port information.
+     *
+     * @return RequestUri
      */
     public function withPort($port)
     {
-        $this->port = $port;
+        $this->_port = $port;
 
         return $this;
     }
@@ -147,11 +174,12 @@ class RequestUri implements UriInterface
      * Return an instance with the specified path.
      *
      * @param string $path The path to use with the new instance.
-     * @return RequestUri A new instance with the specified path.
+     *
+     * @return RequestUri
      */
     public function withPath($path)
     {
-        $this->path = $path;
+        $this->_path = $path;
 
         return $this;
     }
@@ -160,11 +188,12 @@ class RequestUri implements UriInterface
      * Return an instance with the specified query string.
      *
      * @param string $query The query string to use with the new instance.
-     * @return RequestUri A new instance with the specified query string.
+     *
+     * @return RequestUri
      */
     public function withQuery($query)
     {
-        $this->query = $query;
+        $this->_query = $query;
 
         return $this;
     }
@@ -173,11 +202,12 @@ class RequestUri implements UriInterface
      * Return an instance with the specified URI fragment.
      *
      * @param string $fragment The fragment to use with the new instance.
-     * @return RequestUri A new instance with the specified fragment.
+     *
+     * @return RequestUri
      */
     public function withFragment($fragment)
     {
-        $this->fragment = $fragment;
+        $this->_fragment = $fragment;
 
         return $this;
     }
@@ -189,7 +219,7 @@ class RequestUri implements UriInterface
      */
     public function getScheme()
     {
-        return $this->scheme;
+        return $this->_scheme;
     }
 
     /**
@@ -201,11 +231,11 @@ class RequestUri implements UriInterface
     {
         $authority = "";
 
-        $authority .= !empty($this->user) ? $this->user : "";
-        $authority .= !empty($this->pass) ? ":{$this->pass}" : "";
+        $authority .= !empty($this->_user) ? $this->_user : "";
+        $authority .= !empty($this->_pass) ? ":{$this->_pass}" : "";
         $authority .= !empty($authority) ? "@" : "";
-        $authority .= !empty($this->host) ? $this->host : "";
-        $authority .= !empty($this->port) ? ":{$this->port}": "";
+        $authority .= !empty($this->_host) ? $this->_host : "";
+        $authority .= !empty($this->_port) ? ":{$this->_port}": "";
 
         return $authority;
     }
@@ -219,8 +249,8 @@ class RequestUri implements UriInterface
     {
         $userInfo = "";
 
-        $userInfo .= !empty($this->user) ? $this->user : "";
-        $userInfo .= !empty($this->pass) ? ":{$this->pass}" : "";
+        $userInfo .= !empty($this->_user) ? $this->_user : "";
+        $userInfo .= !empty($this->_pass) ? ":{$this->_pass}" : "";
 
         return $userInfo;
     }
@@ -232,7 +262,7 @@ class RequestUri implements UriInterface
      */
     public function getHost()
     {
-        return $this->host;
+        return $this->_host;
     }
 
     /**
@@ -242,7 +272,7 @@ class RequestUri implements UriInterface
      */
     public function getPort()
     {
-        return $this->port;
+        return $this->_port;
     }
 
     /**
@@ -252,7 +282,7 @@ class RequestUri implements UriInterface
      */
     public function getPath()
     {
-        return $this->path;
+        return $this->_path;
     }
 
     /**
@@ -262,7 +292,7 @@ class RequestUri implements UriInterface
      */
     public function getQuery()
     {
-        return $this->query;
+        return $this->_query;
     }
 
     /**
@@ -272,7 +302,7 @@ class RequestUri implements UriInterface
      */
     public function getFragment()
     {
-        return $this->fragment;
+        return $this->_fragment;
     }
 
     /**
