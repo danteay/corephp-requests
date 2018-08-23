@@ -1,4 +1,16 @@
 <?php
+/**
+ * This is the main faile of the corephp-request package
+ *
+ * PHP Version 7.1
+ *
+ * @category  CorePHP-Module
+ * @package   CorePHP\Requests
+ * @author    Eduardo Aguilar <dante.aguilar41@gmail.com>
+ * @copyright 2018 Eduardo Aguilar
+ * @license   https://github.com/danteay/corephp-requests/LICENSE Apache-2
+ * @link      https://github.com/danteay/corephp-requests
+ */
 
 namespace CorePHP\Requests;
 
@@ -6,6 +18,16 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Request
+ *
+ * @category  Class
+ * @package   CorePHP\Requests
+ * @author    Eduardo Aguilar <dante.aguilar41@gmail.com>
+ * @copyright 2018 Eduardo Aguilar
+ * @license   https://github.com/danteay/corephp-requests/LICENSE Apache-2
+ * @link      https://github.com/danteay/corephp-requests
+ */
 class Request implements RequestInterface
 {
     const GET = 'GET';
@@ -25,40 +47,36 @@ class Request implements RequestInterface
      *
      * @var RequestTarget
      */
-    private $target;
-
-    /**
-     * Http object
-     *
-     * @var Http
-     */
-    private $http;
+    private $_target;
 
     /**
      * Flat to keep the origin url set in the first instanciation
      *
      * @var bool
      */
-    private $preserveHost;
+    private $_preserveHost;
 
     /**
      * Request Constructor
      */
     public function __construct()
     {
-        $this->target = RequestTarget::getInstanace();
-        $this->http = new Http();
+        $this->_target = RequestTarget::getInstanace();
     }
 
     /**
      * Make and instace of Request
      *
-     * @param string $type
-     * @param string $url
-     * @param mixed $body
-     * @param array $headers
-     * @param array $auth
+     * @param string $type    Request method that will be used
+     * @param string $url     Target URL of the request
+     * @param mixed  $body    Content of the request
+     * @param array  $headers Headers of the request
+     * @param array  $auth    An array that contains the user and password
+     *                        for basicauth in format
+     *                        ["user" => ... , "pass" => ... ]
+     *
      * @return Request
+     *
      * @throws \Exception
      */
     public static function getInstance(
@@ -71,27 +89,29 @@ class Request implements RequestInterface
         $instance = new Request();
 
         if (!empty($url)) {
-            $instance->target->withUri(new RequestUri($url));
+            $instance->_target->withUri(new RequestUri($url));
         }
 
         if (!empty($type)) {
             if (!in_array($type, self::ALLOW_METHODS)) {
-                throw new \Exception("Invalid method {$type} to create an instance of Request");
+                throw new \Exception(
+                    "Invalid method {$type} to create an instance of Request"
+                );
             }
 
-            $instance->target->withMethod($type);
+            $instance->_target->withMethod($type);
         }
 
         if (!empty($headers) && is_array($headers)) {
-            $instance->target->withHeaders($headers);
+            $instance->_target->withHeaders($headers);
         }
 
         if (!empty($headers) && is_array($auth)) {
-            $instance->target->withBasicAuth($auth['user'], $auth['pass']);
+            $instance->_target->withBasicAuth($auth['user'], $auth['pass']);
         }
 
         if (!empty($data)) {
-            $instance->target->withBody($body);
+            $instance->_target->withBody($body);
         }
 
         return $instance;
@@ -100,13 +120,15 @@ class Request implements RequestInterface
     /**
      * Create an instance of GET Request
      *
-     * @param string $url
-     * @param array $auth
-     * @param array $headers
+     * @param string $url     The target URL for the request
+     * @param array  $headers Headers of the request
+     * @param array  $auth    Basicath data if needed
+     *
      * @return Request
+     *
      * @throws \Exception
      */
-    public static function get($url, $headers=array(), $auth=array())
+    public static function get($url, $headers=[], $auth=[])
     {
         return self::getInstance(self::GET, $url, null, $headers, $auth);
     }
@@ -114,14 +136,16 @@ class Request implements RequestInterface
     /**
      * Create instanace of POST Request
      *
-     * @param string $url
-     * @param mixed $data
-     * @param array $auth
-     * @param array $headers
+     * @param string $url     The target URL for the request
+     * @param mixed  $data    Request body information (string, array or object)
+     * @param array  $headers Headers of the request
+     * @param array  $auth    Basicath data if needed
+     *
      * @return Request
+     *
      * @throws \Exception
      */
-    public static function post($url, $data=null, $headers=array(), $auth=array())
+    public static function post($url, $data=null, $headers=[], $auth=[])
     {
         return self::getInstance(self::POST, $url, $data, $headers, $auth);
     }
@@ -129,14 +153,16 @@ class Request implements RequestInterface
     /**
      * Create Instance of PUT Request
      *
-     * @param string $url
-     * @param mixed $data
-     * @param array $auth
-     * @param array $headers
+     * @param string $url     The target URL for the request
+     * @param mixed  $data    Request body information (string, array or object)
+     * @param array  $headers Headers of the request
+     * @param array  $auth    Basicath data if needed
+     *
      * @return Request
+     *
      * @throws \Exception
      */
-    public static function put($url, $data=array(), $headers=array(), $auth=array())
+    public static function put($url, $data=null, $headers=[], $auth=[])
     {
         return self::getInstance(self::PUT, $url, $data, $headers, $auth);
     }
@@ -144,14 +170,16 @@ class Request implements RequestInterface
     /**
      * Create Instance of DELETE Request
      *
-     * @param string $url
-     * @param mixed $data
-     * @param array $auth
-     * @param array $headers
+     * @param string $url     The target URL for the request
+     * @param mixed  $data    Request body information (string, array or object)
+     * @param array  $headers Headers of the request
+     * @param array  $auth    Basicath data if needed
+     *
      * @return Request
+     *
      * @throws \Exception
      */
-    public static function delete($url, $data=array(), $headers=array(), $auth=array())
+    public static function delete($url, $data=null, $headers=[], $auth=[])
     {
         return self::getInstance(self::DELETE, $url, $data, $headers, $auth);
     }
@@ -169,13 +197,14 @@ class Request implements RequestInterface
     /**
      * Set target MEthod
      *
-     * @param string $method
-     * @return static
+     * @param string $method Request method (GET, POST, PUT, DELETE)
+     *
+     * @return Request
      */
     public function withMethod($method)
     {
         $this->target->withMethod($method);
-        return self;
+        return $this;
     }
 
     /**
@@ -191,13 +220,14 @@ class Request implements RequestInterface
     /**
      * Set Target to the current Request
      *
-     * @param RequestTarget $requestTarget
-     * @return static
+     * @param RequestTarget $requestTarget Object with all the request config
+     *
+     * @return Request
      */
     public function withRequestTarget(RequestTarget $requestTarget)
     {
         $this->target = $requestTarget;
-        return self;
+        return $this;
     }
 
     /**
@@ -213,9 +243,12 @@ class Request implements RequestInterface
     /**
      * Add a valid URI for the request
      *
-     * @param UriInterface $uri
-     * @param boolean $preserveHost
-     * @return static
+     * @param UriInterface $uri          Instance of UriInterface for the
+     *                                   request
+     * @param boolean      $preserveHost Falg to keep the host trougth the
+     *                                   targets
+     *
+     * @return Request
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
@@ -246,8 +279,9 @@ class Request implements RequestInterface
     /**
      * Set the request body
      *
-     * @param StreamInterface $body
-     * @return static
+     * @param StreamInterface $body Body StreamInterface with the request body
+     *
+     * @return Request
      */
     public function withBody(StreamInterface $body)
     {
@@ -268,7 +302,8 @@ class Request implements RequestInterface
     /**
      * Validate if a specific header is set to the target
      *
-     * @param string $name
+     * @param string $name Name of a header
+     *
      * @return boolean
      */
     public function hasHeader($name)
@@ -279,7 +314,8 @@ class Request implements RequestInterface
     /**
      * Retrive the value of a header
      *
-     * @param string $name
+     * @param string $name Name of the header
+     *
      * @return null|array
      */
     public function getHeader($name)
@@ -290,50 +326,64 @@ class Request implements RequestInterface
     /**
      * Retrive all values of a header into a string
      *
-     * @param string $name
+     * @param string $name Name of a header
+     *
      * @return null|string
      */
     public function getHeaderLine($name)
     {
-        return $this->hasHeader($name) ? implode(', ', $this->getHeader($name)) : null;
+        return $this->hasHeader($name) ?
+            implode(', ', $this->getHeader($name)) : null;
     }
 
     /**
      * Set header to the request
      *
-     * @param string $name
-     * @param string $value
+     * @param string $name  Name of the header
+     * @param string $value Value of the header
+     *
+     * @return Request
      */
     public function withHeader($name, $value)
     {
         $headers = $this->getHeaders();
         $headers[$name] = [$value];
         $this->target->withHeaders($headers);
+
+        return $this;
     }
 
     /**
      * Add value to a header
      *
-     * @param string $name
-     * @param string $value
+     * @param string $name  Name of the header
+     * @param string $value Value of the header
+     *
+     * @return Request
      */
     public function withAddedHeader($name, $value)
     {
         $headers = $this->getHeaders();
         $headers[$name][] = $value;
         $this->target->withHeaders($headers);
+
+        return $this;
     }
 
     /**
      * Remove a specific header
      *
-     * @param string $name
+     * @param string $name name of the header
+     *
+     * @return Request
      */
     public function withoutHeader($name)
     {
         $headers = $this->getHeaders();
         unset($headers[$name]);
         $this->target->withHeaders($headers);
+
+        return $this;
     }
 
     /**
@@ -347,11 +397,27 @@ class Request implements RequestInterface
         return $http->executeRequest();
     }
 
+    /**
+     * Not implemented
+     *
+     * @return string
+     *
+     * @throws \BadMethodCallException
+     */
     public function getProtocolVersion()
     {
         throw new \BadMethodCallException("Not Implemented Method");
     }
 
+    /**
+     * Not implemented
+     *
+     * @param string $version Not implemented
+     *
+     * @return void
+     *
+     * @throws \BadMethodCallException
+     */
     public function withProtocolVersion($version)
     {
         throw new \BadMethodCallException("Not Implemented Method");
