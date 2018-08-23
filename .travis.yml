@@ -8,14 +8,15 @@ branches:
 
 before_install:
   - composer self-update
-  - composer global require "fxp/composer-asset-plugin:~1.0.0"
-  - composer install --prefer-source --no-interaction
+  - composer install --prefer-source --no-interaction -dev
 
 install:
   - composer install
   - vendor/bin/phpunit -v
 
 before_script:
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
 
 script:
   - phpunit --configuration unittest.xml --coverage-text
