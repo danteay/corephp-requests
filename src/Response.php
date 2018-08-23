@@ -3,13 +3,110 @@
 namespace CorePHP\Requests;
 
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\StreamInterface;
 
 class Response implements ResponseInterface
 {
+    /**
+     * Response status code
+     *
+     * @var int
+     */
     private $statusCode;
+
+    /**
+     * Status code Phrase
+     *
+     * @var string
+     */
     private $reasonPhrase;
+
+    /**
+     * Headers collection
+     *
+     * @var array
+     */
     private $headers;
+
+    /**
+     * Resquest protocol
+     *
+     * @var string
+     */
+    private $protocol;
+
+    /**
+     * Response body
+     *
+     * @var StreamInterface
+     */
     private $body;
+
+    /**
+     * A parsed version of the body;
+     *
+     * @var mixed
+     */
+    private $bodyParsed;
+
+    /**
+     * Request uri
+     *
+     * @var UriInterface
+     */
+    private $uri;
+
+    /**
+     * flag to persist host in responses
+     *
+     * @var boolean
+     */
+    private $preserveHost;
+
+    /**
+     * Create an instance of Response object
+     *
+     * @param StreamInterface $body
+     * @param int $statusCode
+     * @param array $headers
+     * @param UriInterface $uri
+     * @param string $protocol
+     * @return Response
+     */
+    public static function getInstance(
+        StreamInterface $body = null,
+        $statusCode = null,
+        array $headers = null,
+        UriInterface $uri = null,
+        $protocol = null
+    ) {
+        $instance = new Response();
+
+        if (!empty($body)) {
+            $instance->withBody($body);
+        }
+
+        if (!empty($statusCode)) {
+            $instance->withStatus($statusCode);
+        } else {
+            $instance->withStatus(200);
+        }
+
+        if (!empty($headers)) {
+            $instance->withHeaders($headers);
+        }
+
+        if (!empty($uri)) {
+            $instance->withUri($uri);
+        }
+
+        if (!empty($protocol)) {
+            $instance->withProtocolVersion($protocol);
+        }
+
+        return $instance;
+    }
 
     /**
      * Return the status code
@@ -38,7 +135,7 @@ class Response implements ResponseInterface
      */
     public function getHeaders()
     {
-        return $this->headers;
+        return array_keys($this->headers);
     }
 
     /**
@@ -75,6 +172,7 @@ class Response implements ResponseInterface
 
     /**
      * Return the parsed JSON body
+     *
      * @param string $input
      * @return array
      */
@@ -89,6 +187,7 @@ class Response implements ResponseInterface
 
     /**
      * Return a parsed xml string
+     *
      * @param string $input
      * @return array
      */
@@ -107,7 +206,8 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Return a parsed xml string
+     * Return a parsed URL encoded string
+     *
      * @param string $input
      * @return array
      */
@@ -119,11 +219,13 @@ class Response implements ResponseInterface
 
     /**
      * Return a parsed body depending of the Content-Type header
+     *
      * @return array
+     * @throws \Exception
      */
     public function getParsedBody()
     {
-        $type = $this->headers['Content-Type'];
+        $type = $this->getHeader('Content-Type');
 
         $type = explode(';', $type);
         $type = trim($type[0]);
@@ -132,81 +234,165 @@ class Response implements ResponseInterface
             return $this->bodyParsed;
         }
 
+        $body = $this->body->getContents();
+
         switch ($type) {
             case 'application/xml':
             case 'text/xml':
-                $this->bodyParsed = $this->getXmlBody($this->body);
+                $this->bodyParsed = $this->getXmlBody($body);
                 break;
             case 'application/json':
-                $this->bodyParsed = $this->getJsonBody($this->body);
+                $this->bodyParsed = $this->getJsonBody($body);
                 break;
             case 'application/x-www-form-urlencoded':
-                $this->bodyParsed = $this->getUrlencodedBody($this->body);
+                $this->bodyParsed = $this->getUrlencodedBody($body);
                 break;
             default:
-                throw new \Exception(
-                    "Error Parsing Request Body: not supported type {$type}"
-                );
-                break;
+                throw new \Exception("Error Parsing Request Body: not supported type {$type}");
         }
 
         return $this->bodyParsed;
     }
 
-    public function setBody($body)
-    {
-        $this->body = $body;
-    }
-
-    public function withHeaders($headers)
+    /**
+     * Set Response Headers
+     *
+     * @param array $headers
+     * @return static
+     */
+    public function withHeaders(array $headers)
     {
         $this->headers = $headers;
+        return self;
     }
 
-    public function withStatus($code, $reasonPhrase = '')
+    /**
+     * Set status code an custom phrase if needed
+     *
+     * @param int $code
+     * @param null|string $reasonPhrase
+     * @return static
+     */
+    public function withStatus($code, $reasonPhrase = null)
     {
         $this->statusCode = $code;
-        $this->reasonPhrase = ReasonPhrases::getPhrase($code);
+        $this->reasonPhrase = $reasonPhrase;
+
+        if (empty($reasonPhrase)) {
+            $this->reasonPhrase = ReasonPhrases::getPhrase($code);
+        }
+
+        return self;
     }
 
-    public function withUri(\Psr\Http\Message\UriInterface $uri, $preserveHost = false)
+    /**
+     * Undocumented function
+     *
+     * @param UriInterface $uri
+     * @param boolean $preserveHost
+     * @return static
+     */
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $host = $this->uri->getHost();
+
+        if ($this->preserveHost) {
+            $uri->withHost($host);
+            $this->uri = $uri;
+            $this->preserveHost = $preserveHost;
+        } else {
+            $this->uri = $uri;
+        }
     }
 
+    /**
+     * Retrive the protocol version
+     *
+     * @return string
+     */
     public function getProtocolVersion()
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        return $this->protocol;
     }
 
+    /**
+     * Set the protocol version
+     *
+     * @param string $version
+     * @return static
+     */
     public function withProtocolVersion($version)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->protocol = $version;
+        return self;
     }
 
+    /**
+     * Retrive the value of a specific header
+     *
+     * @param string $name
+     * @return string
+     */
     public function getHeaderLine($name)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        if (array_key_exists($name, $this->headers)) {
+            return implode(', ', $this->headers[$name]);
+        }
+
+        return '';
     }
 
+    /**
+     * Add value to an existing header
+     *
+     * @param string $name
+     * @param string $value
+     * @return static
+     */
     public function withAddedHeader($name, $value)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        if (array_key_exists($name, $this->headers)) {
+            $this->headers[$name][] = $value;
+        } else {
+            $this->headers[$name] = [$value];
+        }
+        return self;
     }
 
+    /**
+     * Remove a header of the response
+     *
+     * @param string $name
+     * @return static
+     */
     public function withoutHeader($name)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        unset($this->headers[$name]);
+        return self;
     }
 
+    /**
+     * Add header to the response
+     *
+     * @param string $name
+     * @param string $value
+     * @return static
+     */
     public function withHeader($name, $value)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
+        $this->headers[$name] = [$value];
+        return self;
     }
 
-    public function withBody(\Psr\Http\Message\StreamInterface $body)
+    /**
+     * Add the response body
+     *
+     * @param StreamInterface $body
+     * @return static;
+     */
+    public function withBody(StreamInterface $body)
     {
-        throw new \BadMethodCallException("Not Implemented Method");
-
+        $this->body = $body;
+        return self;
     }
 }

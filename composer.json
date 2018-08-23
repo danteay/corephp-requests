@@ -23,7 +23,14 @@
             "CorePHP\\Requests\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "CorePHP\\Requests\\Test\\": "tests"
+        }
+    },
     "scripts": {
-        "test": "./vendor/bin/phpunit ./tests/TestRequest.php"
+        "test": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration ./unittest.xml",
+        "test-unit": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite unittest",
+        "test-coverage": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite coverage"
     }
 }
