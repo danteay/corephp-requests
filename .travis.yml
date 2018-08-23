@@ -6,5 +6,11 @@ php:
 branches:
   only: master
 
-scripts:
-  - phpunit --bootstrap $TRAVIS_BUILD_DIR/vendor/autoload.php --configuration $TRAVIS_BUILD_DIR/unittest.xml
+install:
+  - composer install
+  - vendor/bin/phpunit -v
+
+before_script:
+
+script:
+  - phpunit --configuration unittest.xml --coverage-text
