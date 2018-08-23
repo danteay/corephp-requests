@@ -76,7 +76,7 @@ class RequestUri implements UriInterface
 
         $parsed = parse_url($url);
 
-        $instance = self::getInstance()
+        $instance = RequestUri::getInstance()
             ->withScheme($parsed['scheme'])
             ->withUserInfo($parsed['user'], $parsed['pass'])
             ->withHost($parsed['host'])
@@ -92,13 +92,13 @@ class RequestUri implements UriInterface
      * Return an instance with the specified scheme.
      *
      * @param string $scheme The scheme to use with the new instance.
-     * @return static A new instance with the specified scheme.
+     * @return RequestUri A new instance with the specified scheme.
      */
     public function withScheme($scheme)
     {
         $this->scheme = $scheme;
 
-        return self;
+        return $this;
     }
 
     /**
@@ -106,27 +106,27 @@ class RequestUri implements UriInterface
      *
      * @param string $user The user name to use for authority.
      * @param null|string $password The password associated with $user.
-     * @return static A new instance with the specified user information.
+     * @return RequestUri A new instance with the specified user information.
      */
     public function withUserInfo($user, $password = null)
     {
         $this->user = $user;
         $this->pass = $password;
 
-        return self;
+        return $this;
     }
 
     /**
      * Return an instance with the specified host.
      *
      * @param string $host The hostname to use with the new instance.
-     * @return static A new instance with the specified host.
+     * @return RequestUri A new instance with the specified host.
      */
     public function withHost($host)
     {
         $this->host = $host;
 
-        return self;
+        return $this;
     }
 
     /**
@@ -134,52 +134,52 @@ class RequestUri implements UriInterface
      *
      * @param null|int $port The port to use with the new instance; a null value
      *     removes the port information.
-     * @return static A new instance with the specified port.
+     * @return RequestUri A new instance with the specified port.
      */
     public function withPort($port)
     {
         $this->port = $port;
 
-        return self;
+        return $this;
     }
 
     /**
      * Return an instance with the specified path.
      *
      * @param string $path The path to use with the new instance.
-     * @return static A new instance with the specified path.
+     * @return RequestUri A new instance with the specified path.
      */
     public function withPath($path)
     {
         $this->path = $path;
 
-        return self;
+        return $this;
     }
 
     /**
      * Return an instance with the specified query string.
      *
      * @param string $query The query string to use with the new instance.
-     * @return static A new instance with the specified query string.
+     * @return RequestUri A new instance with the specified query string.
      */
     public function withQuery($query)
     {
         $this->query = $query;
 
-        return self;
+        return $this;
     }
 
     /**
      * Return an instance with the specified URI fragment.
      *
      * @param string $fragment The fragment to use with the new instance.
-     * @return static A new instance with the specified fragment.
+     * @return RequestUri A new instance with the specified fragment.
      */
     public function withFragment($fragment)
     {
         $this->fragment = $fragment;
 
-        return self;
+        return $this;
     }
 
     /**

@@ -14,8 +14,8 @@ class RequestUriTest extends TestCase
 {
     const URL = "https://user:pass@localhost:1234/host/path?query=value#fragment";
     const USER = 'user';
-    const pass = 'pass';
-    const host = 'localhost';
+    const PASS = 'pass';
+    const HOST = 'localhost';
     const PORT = 1234;
     const PATH = '/host/path';
     const QUERY = 'query=value';
@@ -27,12 +27,14 @@ class RequestUriTest extends TestCase
     /**
      * Create plain instance of RequestUri
      *
-     * @return void
+     * @return RequestUri
      */
     public function testCreateInstanceWithoutParams()
     {
         $object = RequestUri::getInstance();
         $this->assertInstanceOf(RequestUri::class, $object);
+
+        return $object;
     }
 
     /**
@@ -42,7 +44,7 @@ class RequestUriTest extends TestCase
      */
     public function testCreateInstanceWithParams()
     {
-        $object = RequestUri::getInstance(self::URL);
+        $object = RequestUri::getInstance(RequestUriTest::URL);
         $this->assertInstanceOf(RequestUri::class, $object);
 
         return $object;
@@ -58,36 +60,97 @@ class RequestUriTest extends TestCase
     public function testGetScheme(RequestUri $object)
     {
         $scheme = $object->getScheme();
-        $this->assertEquals(self::SCHEME, $scheme);
-
-        return $object;
+        $this->assertEquals(RequestUriTest::SCHEME, $scheme);
     }
 
     /**
      * Validate Authority of Uri object
      *
+     * @depends testCreateInstanceWithParams
      * @param RequestUri $object
      * @return RequestUri
      */
     public function testGetAuthority(RequestUri $object)
     {
         $authority = $object->getAuthority();
-        $this->assertEquals(self::AUTHORITY, $authority);
-
-        return $object;
+        $this->assertEquals(RequestUriTest::AUTHORITY, $authority);
     }
 
     /**
-     * VAlidate User information of Uri object
+     * Validate User information of Uri object
      *
+     * @depends testCreateInstanceWithParams
      * @param RequestUri $object
      * @return RequestUri
      */
     public function testGetUserInfo(RequestUri $object)
     {
         $userinfo = $object->getUserInfo();
-        $this->assertEquals(self::USERINFO, $userinfo);
+        $this->assertEquals(RequestUriTest::USERINFO, $userinfo);
+    }
 
-        return $object;
+    /**
+     * Validate Host of Uri object
+     *
+     * @depends testCreateInstanceWithParams
+     * @param RequestUri $object
+     * @return RequestUri
+     */
+    public function testGetHost(RequestUri $object)
+    {
+        $host = $object->getHost();
+        $this->assertEquals(RequestUriTest::HOST, $host);
+    }
+
+    /**
+     * Validate Port of Uri object
+     *
+     * @depends testCreateInstanceWithParams
+     * @param RequestUri $object
+     * @return RequestUri
+     */
+    public function testGetPort(RequestUri $object)
+    {
+        $port = $object->getPort();
+        $this->assertEquals(RequestUriTest::PORT, $port);
+    }
+
+    /**
+     * Validate Path of Uri object
+     *
+     * @depends testCreateInstanceWithParams
+     * @param RequestUri $object
+     * @return RequestUri
+     */
+    public function testGetPath(RequestUri $object)
+    {
+        $path = $object->getPath();
+        $this->assertEquals(RequestUriTest::PATH, $path);
+    }
+
+    /**
+     * Validate Query of Uri object
+     *
+     * @depends testCreateInstanceWithParams
+     * @param RequestUri $object
+     * @return RequestUri
+     */
+    public function testGetQuery(RequestUri $object)
+    {
+        $query = $object->getQuery();
+        $this->assertEquals(RequestUriTest::QUERY, $query);
+    }
+
+    /**
+     * Validate Fragment of Uri object
+     *
+     * @depends testCreateInstanceWithParams
+     * @param RequestUri $object
+     * @return RequestUri
+     */
+    public function testGetFragment(RequestUri $object)
+    {
+        $fragment = $object->getFragment();
+        $this->assertEquals(RequestUriTest::FRAGMENT, $fragment);
     }
 }
