@@ -128,6 +128,11 @@ class RequestBody implements StreamInterface
         throw new \BadMethodCallException("Not Implemented Method");
     }
 
+    public function read($length)
+    {
+        throw new \BadMethodCallException("Not Implemented Method");
+    }
+
     public function isWritable()
     {
         throw new \BadMethodCallException("Not Implemented Method");

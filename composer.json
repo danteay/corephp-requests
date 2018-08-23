@@ -29,7 +29,7 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml",
+        "test": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration ./unittest.xml",
         "test-unit": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite unittest",
         "test-coverage": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite coverage"
     }
