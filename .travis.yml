@@ -5,5 +5,10 @@ php:
   - 7.1
   - 7.2
 
-install: composer install
-build: composer test
+branches:
+  only: master
+
+install: composer install -n
+
+scripts:
+  - phpunit --bootstrap $TRAVIS_BUILD_DIR/vendor/autoload.php --configuration $TRAVIS_BUILD_DIR/unittest.xml
