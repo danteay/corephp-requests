@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "php": ">= 7",
+        "php": ">= 7.1",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
@@ -29,8 +29,6 @@
         }
     },
     "scripts": {
-        "test": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration ./unittest.xml",
-        "test-unit": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite unittest",
-        "test-coverage": "./vendor/bin/phpunit --bootstrap ./vendor/autoload.php --configuration unittest.xml --testsuite coverage"
+        "test": "./vendor/bin/phpunit"
     }
 }
