@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <phpunit bootstrap="./vendor/autoload.php"
-         color="true"
+         colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         stopOnFailures="false"
+         stopOnFailure="false"
          syntaxCheck="false">
+
     <testsuites>
         <testsuite name="coverage">
-            <directory suffix='.php'>./tests/Coverage/</directory>
-            <!-- <file>./tests/Coverage/RequestUriTest.php</file>
-            <file>./tests/Coverage/RequestTargetTest.php</file> -->
+            <directory suffix='.php'>./tests/</directory>
         </testsuite>
     </testsuites>
+
 </phpunit>
