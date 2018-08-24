@@ -38,6 +38,133 @@ class RequestUriTest extends TestCase
     }
 
     /**
+     * Test set scheme
+     *
+     * @depends testCreateInstanceWithoutParams
+     * @param RequestUri $object RequestUri Obejct
+     * @return RequestUri
+     */
+    public function testWithScheme(RequestUri $object)
+    {
+        $object = $object->withScheme(RequestUriTest::SCHEME);
+        $this->assertEquals(RequestUriTest::SCHEME, $object->getScheme());
+
+        return $object;
+    }
+
+    /**
+     * Test Set Userinfo
+     *
+     * @depends testWithScheme
+     * @param RequestUri $object Uri obect
+     * @return RequestUri
+     */
+    public function testWithUserInfo(RequestUri $object)
+    {
+        $object = $object->withUserInfo(RequestUriTest::USER, RequestUriTest::PASS);
+        $this->assertEquals(RequestUriTest::USERINFO, $object->getUserInfo());
+
+        return $object;
+    }
+
+    /**
+     * Test set host
+     *
+     * @depends testWithUserInfo
+     * @param RequestUri $object Uri object
+     * @return RequestUri
+     */
+    public function testWithHost(RequestUri $object)
+    {
+        $object = $object->withHost(RequestUriTest::HOST);
+        $this->assertEquals(RequestUriTest::HOST, $object->getHost());
+
+        return $object;
+    }
+
+    /**
+     * Test set port
+     *
+     * @depends testWithHost
+     * @param RequestUri $object Uri object
+     * @return RequestUri
+     */
+    public function testWithPort(RequestUri $object)
+    {
+        $object = $object->withPort(RequestUriTest::PORT);
+        $this->assertEquals(RequestUriTest::PORT, $object->getPort());
+
+        return $object;
+    }
+
+    /**
+     * Test authority construction
+     *
+     * @depends testWithPort
+     * @param RequestUri $object Uri object
+     */
+    public function testConstructAuthority(RequestUri $object)
+    {
+        $this->assertEquals(RequestUriTest::AUTHORITY, $object->getAuthority());
+    }
+
+    /**
+     * Test set path to uri
+     *
+     * @depends testWithPort
+     * @param RequestUri $object Uri object
+     * @return RequestUri
+     */
+    public function testWithPath(RequestUri $object)
+    {
+        $object = $object->withPath(RequestUriTest::PATH);
+        $this->assertEquals(RequestUriTest::PATH, $object->getPath());
+
+        return $object;
+    }
+
+    /**
+     * Test set query to the Uri
+     *
+     * @depends testWithPath
+     * @param RequestUri $object Uri object
+     * @return RequestUri
+     */
+    public function testWithQuery(RequestUri $object)
+    {
+        $object = $object->withQuery(RequestUriTest::QUERY);
+        $this->assertEquals(RequestUriTest::QUERY, $object->getQuery());
+
+        return $object;
+    }
+
+    /**
+     * test set fragment to Uri
+     *
+     * @depends testWithQuery
+     * @param RequestUri $object Uri object
+     * @return RequestUri
+     */
+    public function testWithFragment(RequestUri $object)
+    {
+        $object = $object->withFragment(RequestUriTest::FRAGMENT);
+        $this->assertEquals(RequestUriTest::FRAGMENT, $object->getFragment());
+
+        return $object;
+    }
+
+    /**
+     * Test the composed uri
+     *
+     * @depends testWithFragment
+     * @param RequestUri $object Full composed Uri
+     */
+    public function testConstructedUri(RequestUri $object)
+    {
+        $this->assertEquals(RequestUriTest::URL, $object);
+    }
+
+    /**
      * Create instance with a base url
      *
      * @return RequestUri
